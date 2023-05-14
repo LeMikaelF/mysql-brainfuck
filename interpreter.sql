@@ -11,7 +11,6 @@ with
                       select
                           -- memory
                           case
-                              -- TODO implement -
                               when substring(tape.value, instrPointer, 1) = '+' then concat(
                                       substring(memory, 1, memPointer - 1),
                                       char(ascii(substring(memory, memPointer, 1)) + 1),
