@@ -16,6 +16,7 @@ var fizzBuzzOutput string
 type test struct {
 	name           string
 	tape           string
+	input          string
 	expectedOutput string
 }
 
@@ -52,6 +53,7 @@ func Test_Interpreter(t *testing.T) {
 			// from https://www.nayuki.io/page/brainfuck-interpreter-javascript
 			name:           "Reverse the input",
 			tape:           ">,[>,]<[.<]",
+			input:          "ABCDEFG",
 			expectedOutput: "GFEDCBA",
 		},
 	}
@@ -59,7 +61,7 @@ func Test_Interpreter(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			var actualOutput string
 			var ignored any
-			err := db.QueryRow(query, test.tape).Scan(&actualOutput, &ignored, &ignored, &ignored, &ignored)
+			err := db.QueryRow(query, test.tape, test.input).Scan(&actualOutput, &ignored, &ignored, &ignored, &ignored)
 			if err != nil {
 				t.Fatalf("could not query: %v", err)
 			}

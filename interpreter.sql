@@ -2,8 +2,9 @@
 -- >++++++++[<+++++++++>-]<.
 
 with
-#     recursive tape (value) as (select '>+++++++++[<++++++++>-]<.>++++++[<+++++>-]<-.+++++++..+++.>> +++++++[<++++++>-]<++.------------.<++++++++.--------.+++.------.--------. >+.'),
-    recursive tape (value) as (select ?),
+    recursive
+    tape (value) as (select ?),
+    input (value) as (select ?),
     braceMatchesWorker(program, pointer, nests, charAt, matches, lastOpeningsAndNestPos)
     as (select tape.value,
                0,
@@ -50,7 +51,7 @@ with
     interpreter (memory, memPointer, output, instrPointer, iteration, done)
     as (select cast(repeat('\0', memLength.value) as binary) as memory,
                1                                             as memPointer,
-               cast('' as char(500))                          as output,
+               cast('' as char(500))                         as output,
                1                                             as instrPointer,
                0                                             as iteration,
                false                                         as done
