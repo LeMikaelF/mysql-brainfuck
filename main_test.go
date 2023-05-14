@@ -47,7 +47,7 @@ func Test_Interpreter(t *testing.T) {
 		t.Run(testName(test), func(t *testing.T) {
 			var actualOutput string
 			var ignored any
-			err := db.QueryRow(query, test.tape).Scan(&actualOutput, &ignored, &ignored, &ignored)
+			err := db.QueryRow(query, test.tape).Scan(&actualOutput, &ignored, &ignored, &ignored, &ignored)
 			if err != nil {
 				t.Errorf("could not query: %v", err)
 			}
