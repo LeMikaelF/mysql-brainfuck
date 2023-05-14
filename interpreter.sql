@@ -16,6 +16,7 @@ with
                       union all
                       select
                           -- memory
+                          -- TODO implement comma operator (input)
                           case
                               when substring(tape.value, instrPointer, 1) = '+' then concat(
                                       substring(memory, 1, memPointer - 1),
