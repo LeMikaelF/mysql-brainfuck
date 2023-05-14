@@ -26,6 +26,10 @@ func Test_Interpreter(t *testing.T) {
 			expectedOutput: "3",
 		},
 		{
+			tape:           "+++-.",
+			expectedOutput: "2",
+		},
+		{
 			tape:           "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.",
 			expectedOutput: "Hello, World!",
 		},
