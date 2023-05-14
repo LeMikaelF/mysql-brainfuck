@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	_ "embed"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
 )
@@ -56,9 +55,8 @@ func Test_Interpreter(t *testing.T) {
 			expectedOutput: "GFEDCBA",
 		},
 	}
-
 	for _, test := range tests {
-		t.Run(testName(test), func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			var actualOutput string
 			var ignored any
 			err := db.QueryRow(query, test.tape).Scan(&actualOutput, &ignored, &ignored, &ignored, &ignored)
@@ -70,8 +68,4 @@ func Test_Interpreter(t *testing.T) {
 			}
 		})
 	}
-}
-
-func testName(test test) string {
-	return fmt.Sprintf("given '%s' returns '%s'", test.tape, test.expectedOutput)
 }
