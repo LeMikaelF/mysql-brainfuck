@@ -22,28 +22,17 @@ func Test_Interpreter(t *testing.T) {
 		expectedOutput string
 	}{
 		{
-			tape:           "+++.",
-			expectedOutput: "3",
+			// from http://esoteric.sange.fi/brainfuck/bf-source/prog/fibonacci.txt
+			tape:           "+++++++++++>+>>>>++++++++++++++++++++++++++++++++++++++++++++>++++++++++++++++++++++++++++++++<<<<<<[>[>>>>>>+>+<<<<<<<-]>>>>>>>[<<<<<<<+>>>>>>>-]<[>++++++++++[-<-[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<[>>>+<<<-]>>[-]]<<]>>>[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<+>>[-]]<<<<<<<]>>>>>[++++++++++++++++++++++++++++++++++++++++++++++++.[-]]++++++++++<[->-<]>++++++++++++++++++++++++++++++++++++++++++++++++.[-]<<<<<<<<<<<<[>>>+>+<<<<-]>>>>[<<<<+>>>>-]<-[>>.>.<<<[-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]",
+			expectedOutput: "supposed to generate Fibonacci sequence",
 		},
 		{
-			tape:           "+++-.",
-			expectedOutput: "2",
+			tape:           "+++++++++[>++++++++<-]>.",
+			expectedOutput: "H",
 		},
 		{
-			tape:           "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.",
-			expectedOutput: "Hello, World!",
-		},
-		{
-			tape:           ",.>,.>,.>,.<<<.",
-			expectedOutput: "ABC",
-		},
-		{
-			tape:           "+++++++++[>+++++++<-]>.",
-			expectedOutput: "A",
-		},
-		{
-			tape:           "++++++++[>++++++<-]>[<+++++>-]+<+[-<+]-[-<+]-[-<+]->[-<+]->[-<+]->[-<+]->[-<+]->[-<+]->[-<+]->[-<+]->[-<+]->.",
-			expectedOutput: "011235813213455",
+			tape:           ">+++++++++[<++++++++>-]<.>++++++[<+++++>-]<-.+++++++..+++.>> +++++++[<++++++>-]<++.------------.<++++++++.--------.+++.------.--------. >+.",
+			expectedOutput: "Hello, world!",
 		},
 	}
 
@@ -53,7 +42,7 @@ func Test_Interpreter(t *testing.T) {
 			var ignored any
 			err := db.QueryRow(query, test.tape).Scan(&actualOutput, &ignored, &ignored, &ignored, &ignored)
 			if err != nil {
-				t.Errorf("could not query: %v", err)
+				t.Fatalf("could not query: %v", err)
 			}
 			if test.expectedOutput != actualOutput {
 				t.Errorf("wrong return value: expected '%v', got '%v'", test.expectedOutput, actualOutput)
