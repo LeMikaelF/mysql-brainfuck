@@ -26,10 +26,8 @@ with
 
                           -- memPointer
                           case
-                              when substring(tape.value, memPointer, 1) = '>'
-                                  then (memPointer + 1) % memLength.value
-                              when substring(tape.value, memPointer, 1) = '<'
-                                  then (memPointer - 1) % memLength.value
+                              when substring(tape.value, memPointer, 1) = '>' then (memPointer + 1) % memLength.value
+                              when substring(tape.value, memPointer, 1) = '<' then (memPointer - 1) % memLength.value
                               else memPointer
                               end          as memPointer,
 
