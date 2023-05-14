@@ -25,6 +25,10 @@ func Test_Interpreter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to open sql: %v", err)
 	}
+	_, err = db.Exec("set @@cte_max_recursion_depth = 10000000")
+	if err != nil {
+		t.Fatalf("could not set max recursion depth: %v", err)
+	}
 
 	var tests = []test{
 		{
@@ -60,8 +64,7 @@ func Test_Interpreter(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var actualOutput string
-			var ignored any
-			err := db.QueryRow(query, test.tape, test.input).Scan(&actualOutput, &ignored, &ignored, &ignored, &ignored)
+			err := db.QueryRow(query, test.tape, test.input).Scan(&actualOutput)
 			if err != nil {
 				t.Fatalf("could not query: %v", err)
 			}

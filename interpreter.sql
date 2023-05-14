@@ -1,52 +1,44 @@
-# set @@cte_max_recursion_depth = 10000000;
--- >++++++++[<+++++++++>-]<.
-
 with
     recursive tape (value) as (select ?),
               input (value) as (select ?),
-              braceMatchesWorker(program, pointer, nests, charAt, matches, lastOpeningsAndNestPos)
-                  as (select tape.value,
+              braceMatchesWorker(tapePointer, nestLevel, matches, openingBracesStack)
+                  as (select 0,
                              0,
-                             0,
-                             cast('' as char(1)) as charAt,
-                             json_object()       as matches,
-                             json_array()        as lastOpeningsAndNestPos
+                             json_object() as matches,
+                             json_array()  as openingBracesStack
                       from tape
                       union all
-                      select program         as program,
-                             pointer + 1,
+                      select tapePointer + 1,
                              case
-                                 when substring(program, pointer + 1, 1) = '[' then nests + 1
-                                 when substring(program, pointer + 1, 1) = ']' then nests - 1
-                                 else nests
-                                 end         as nests,
-                             substring(tape.value, pointer + 1, 1)
-                              ,
+                                 when substring(tape.value, tapePointer + 1, 1) = '[' then nestLevel + 1
+                                 when substring(tape.value, tapePointer + 1, 1) = ']' then nestLevel - 1
+                                 else nestLevel
+                                 end         as nestLevels,
                              -- matches
-                             IF(substring(program, pointer + 1, 1) = ']', json_insert(
+                             IF(substring(tape.value, tapePointer + 1, 1) = ']', json_insert(
                                      json_insert(matches, concat('$."', json_extract(
-                                             lastOpeningsAndNestPos,
-                                             concat('$[', json_length(lastOpeningsAndNestPos) - 1, ']')), '"'),
-                                                 pointer + 1),
-                                     concat('$."', pointer + 1, '"'),
-                                     json_extract(lastOpeningsAndNestPos,
-                                                  concat('$[', json_length(lastOpeningsAndNestPos) - 1, ']'))
+                                             openingBracesStack,
+                                             concat('$[', json_length(openingBracesStack) - 1, ']')), '"'),
+                                                 tapePointer + 1),
+                                     concat('$."', tapePointer + 1, '"'),
+                                     json_extract(
+                                             openingBracesStack,
+                                             concat('$[', json_length(openingBracesStack) - 1, ']'))
                                  ), matches) as matches,
 
-                             -- lastOpeningsAndNestPos
+                             -- openingBracesStack
                              case
-                                 when substring(program, pointer + 1, 1) = '['
-                                     then json_array_append(lastOpeningsAndNestPos, '$', pointer + 1)
-                                 when substring(program, pointer + 1, 1) = ']'
-                                     then json_remove(lastOpeningsAndNestPos,
-                                                      concat('$[', json_length(lastOpeningsAndNestPos) - 1, ']'))
-                                 else lastOpeningsAndNestPos
-                                 end         as lastOpeningsAndNestPos
+                                 when substring(tape.value, tapePointer + 1, 1) = '['
+                                     then json_array_append(openingBracesStack, '$', tapePointer + 1)
+                                 when substring(tape.value, tapePointer + 1, 1) = ']'
+                                     then json_remove(openingBracesStack,
+                                                      concat('$[', json_length(openingBracesStack) - 1, ']'))
+                                 else openingBracesStack
+                                 end         as openingBracesStack
                       from braceMatchesWorker,
                            tape
-                      where pointer < length(program))
-        ,
-              bracesMatches (matches) as (select matches from braceMatchesWorker order by pointer desc limit 1),
+                      where tapePointer < length(tape.value)),
+              bracesMatches (matches) as (select matches from braceMatchesWorker order by tapePointer desc limit 1),
               memLength (value) as (select 1000),
               interpreter (memory, memPointer, output, instrPointer, inputPointer, iteration, done)
                   as (select cast(repeat('\0', memLength.value) as binary) as memory,
@@ -95,12 +87,12 @@ with
                           case
                               when substring(tape.value, instrPointer, 1) = '['
                                   then if(substring(memory, memPointer, 1) = '\0',
-                                          json_extract(bracesMatches.matches, concat('$."', instrPointer, '"')) + 1,
-                                          instrPointer + 1)
+                                          json_extract(bracesMatches.matches,
+                                                       concat('$."', instrPointer, '"')) + 1, instrPointer + 1)
                               when substring(tape.value, instrPointer, 1) = ']'
                                   then if(substring(memory, memPointer, 1) <> '\0',
-                                          json_extract(bracesMatches.matches, concat('$."', instrPointer, '"')) + 1,
-                                          instrPointer + 1)
+                                          json_extract(bracesMatches.matches,
+                                                       concat('$."', instrPointer, '"')) + 1, instrPointer + 1)
                               else instrPointer + 1
                               end
                                                              as instrPointer,
@@ -117,10 +109,10 @@ with
                            bracesMatches,
                            input
                       where iteration < 600000 && !done)
-select output, iteration, left(memory, 20) as memory, instrPointer, memPointer
+select output
 from interpreter,
      memLength,
      tape,
      bracesMatches
 order by iteration desc
-LIMIT 100 OFFSET 1;
+LIMIT 1 OFFSET 1;
