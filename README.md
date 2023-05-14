@@ -13,3 +13,10 @@ There is a small test harness with the following toy programs (sources for these
 * Output "Hello, world!"
 * Fizzbuzz
 * Reverse the given input
+
+## To run tests
+```sh
+docker-compose up
+# wait until DB is up
+go test main_test.go -v
+```
