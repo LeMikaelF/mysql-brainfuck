@@ -1,4 +1,4 @@
-# MySQL Brainfuck interpreter
+# MySQL Brainfuck Interpreter
 
 This is an interpreter for the esolang [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) that runs in a single MySQL
 query (see [interpreter.sql](interpreter.sql)). Since Brainfuck is turing-complete, this is part of an ongoing effort to
