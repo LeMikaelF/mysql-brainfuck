@@ -1,17 +1,11 @@
 with
     recursive constants(tape, input, memLength, maxIterations) as (select ?, ?, 1000, 600000),
-              braceMatchesWorker(tapePointer, nestLevel, matches, openingBracesStack)
+              braceMatchesWorker(tapePointer, matches, openingBracesStack)
                   as (select 0,
-                             0,
                              json_object() as matches,
                              json_array()  as openingBracesStack
                       union all
                       select tapePointer + 1,
-                             case
-                                 when substring(constants.tape, tapePointer + 1, 1) = '[' then nestLevel + 1
-                                 when substring(constants.tape, tapePointer + 1, 1) = ']' then nestLevel - 1
-                                 else nestLevel
-                                 end         as nestLevels,
                              -- matches
                              IF(substring(constants.tape, tapePointer + 1, 1) = ']', json_insert(
                                      json_insert(matches, concat('$."', json_extract(
