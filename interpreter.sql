@@ -1,18 +1,18 @@
 with
     recursive constants(tape, input, memLength, maxIterations) as (select ?, ?, 1000, 600000),
               braceMatchesWorker(tapePointer, matches, openingBracesStack)
-                  as (select 0,
+                  as (select 1,
                              json_object() as matches,
                              json_array()  as openingBracesStack
                       union all
                       select tapePointer + 1,
                              -- matches
-                             IF(substring(constants.tape, tapePointer + 1, 1) = ']', json_insert(
+                             IF(substring(constants.tape, tapePointer, 1) = ']', json_insert(
                                      json_insert(matches, concat('$."', json_extract(
                                              openingBracesStack,
                                              concat('$[', json_length(openingBracesStack) - 1, ']')), '"'),
-                                                 tapePointer + 1),
-                                     concat('$."', tapePointer + 1, '"'),
+                                                 tapePointer),
+                                     concat('$."', tapePointer, '"'),
                                      json_extract(
                                              openingBracesStack,
                                              concat('$[', json_length(openingBracesStack) - 1, ']'))
@@ -20,16 +20,16 @@ with
 
                              -- openingBracesStack
                              case
-                                 when substring(constants.tape, tapePointer + 1, 1) = '['
-                                     then json_array_append(openingBracesStack, '$', tapePointer + 1)
-                                 when substring(constants.tape, tapePointer + 1, 1) = ']'
+                                 when substring(constants.tape, tapePointer, 1) = '['
+                                     then json_array_append(openingBracesStack, '$', tapePointer)
+                                 when substring(constants.tape, tapePointer, 1) = ']'
                                      then json_remove(openingBracesStack,
                                                       concat('$[', json_length(openingBracesStack) - 1, ']'))
                                  else openingBracesStack
                                  end         as openingBracesStack
                       from braceMatchesWorker,
                            constants
-                      where tapePointer < length(constants.tape)),
+                      where tapePointer <= length(constants.tape)),
               bracesMatches (matches) as (select matches from braceMatchesWorker order by tapePointer desc limit 1),
               interpreter (memory, memPointer, output, instrPointer, inputPointer, iteration, done)
                   as (select cast(repeat('\0', constants.memLength) as binary) as memory,
